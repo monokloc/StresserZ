@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StresserZ</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #000000, #302b63, #000000);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .log-entry {
+      font-family: monospace;
+    }
+    .fade-in {
+      animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Custom Scrollbar */
+    #logOutput::-webkit-scrollbar {
+      width: 8px;
+    }
+    #logOutput::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+    }
+    #logOutput::-webkit-scrollbar-thumb {
+      background-color: #ec4899;
+      border-radius: 4px;
+      border: 2px solid #1a1a1a;
+    }
+  </style>
+</head>
+<body class="p-8 bg-black text-white">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8 text-center text-pink-500">StresserZ</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Attack Form -->
+      <div class="bg-pink-900/20 p-6 rounded-2xl shadow-lg border border-pink-500/30 fade-in">
+        <h2 class="text-xl font-semibold mb-4 text-pink-300">Launch Attack</h2>
+        <form id="attackForm" class="space-y-4">
+          <div>
+            <label class="block text-sm text-pink-200">Target IP/Host</label>
+            <input type="text" id="target" class="w-full p-2 bg-gray-800 rounded text-white" required />
+          </div>
+          <div>
+            <label class="block text-sm text-pink-200">Port</label>
+            <input type="number" id="port" class="w-full p-2 bg-gray-800 rounded text-white" required />
+          </div>
+          <div>
+            <label class="block text-sm text-pink-200">Method</label>
+            <select id="method" class="w-full p-2 bg-gray-800 rounded text-white">
+              <option>UDP</option>
+              <option>TCP</option>
+              <option>HTTP</option>
+              <option>OVH Bypass</option>
+              <option>HTTPS-FLOOD</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-pink-200">Duration (seconds)</label>
+            <input type="number" id="duration" class="w-full p-2 bg-gray-800 rounded text-white" required />
+          </div>
+          <button type="submit" class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded transition-all">Start Attack</button>
+        </form>
+      </div>
+
+      <!-- Log Output -->
+      <div class="bg-gray-800/70 p-6 rounded-2xl shadow-lg fade-in border border-pink-400/20">
+        <h2 class="text-xl font-semibold mb-4 text-pink-300">Logs</h2>
+        <div id="logOutput" class="h-64 overflow-y-scroll bg-black/80 p-4 rounded text-green-400 text-sm space-y-1">
+          <div class="log-entry">[WAITING] Ready to launch attack...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="bg-gray-800/60 mt-10 p-6 rounded-2xl shadow-lg border border-pink-500/20 fade-in">
+      <h2 class="text-xl font-semibold mb-4 text-pink-300">Live Stats</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div>
+          <div class="text-sm text-pink-200">Active Bots</div>
+          <div id="bots" class="text-3xl font-bold">0</div>
+        </div>
+        <div>
+          <div class="text-sm text-pink-200">Packets Sent</div>
+          <div id="packets" class="text-3xl font-bold">0</div>
+        </div>
+        <div>
+          <div class="text-sm text-pink-200">Attacks</div>
+          <div id="attacks" class="text-3xl font-bold">0</div>
+        </div>
+        <div>
+          <div class="text-sm text-pink-200">Power</div>
+          <div id="power" class="text-3xl font-bold">0 Gbps</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("attackForm");
+    const logOutput = document.getElementById("logOutput");
+    const bots = document.getElementById("bots");
+    const packets = document.getElementById("packets");
+    const attacks = document.getElementById("attacks");
+    const power = document.getElementById("power");
+
+    let packetCount = 0;
+    let attackCount = 0;
+
+    function fakeLog(message) {
+      const entry = document.createElement("div");
+      entry.className = "log-entry fade-in";
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logOutput.appendChild(entry);
+      logOutput.scrollTop = logOutput.scrollHeight;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ip = document.getElementById("target").value;
+      const port = document.getElementById("port").value;
+      const method = document.getElementById("method").value;
+      const duration = parseInt(document.getElementById("duration").value);
+
+      attackCount++;
+      attacks.textContent = attackCount;
+
+      fakeLog(`Starting ${method} attack on ${ip}:${port} for ${duration}s`);
+
+      let interval = setInterval(() => {
+        const packetsSent = Math.floor(Math.random() * 10000 + 50000);
+        packetCount += packetsSent;
+        packets.textContent = packetCount.toLocaleString();
+
+        bots.textContent = Math.floor(Math.random() * 150 + 350);
+        power.textContent = (Math.random() * 12 + 5).toFixed(1) + " Gbps";
+
+        fakeLog(`Sent ${packetsSent.toLocaleString()} packets to ${ip}:${port}`);
+      }, 500);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        fakeLog(`Attack on ${ip}:${port} finished.`);
+      }, duration * 1000);
+    });
+  </script>
+</body>
+</html>
